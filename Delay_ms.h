@@ -1,3 +1,4 @@
+#define STM32L452xx 1
 #include "stm32l4xx.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -15,7 +16,7 @@ void TIM2Config (void)
 	************************************************/
         
 	RCC->APB1ENR1 |= (1<<0);
-	TIM2->PSC = 0x48-1;
+	TIM2->PSC = 80-1;
 	TIM2->CR1 &= ~(3<<5);
 	TIM2->CR1 &= ~(1<<7);
 	TIM2->ARR &= ~(0xffffffff);
@@ -39,7 +40,7 @@ void delay_us (volatile uint16_t us)
 
 void delay_ms (volatile uint16_t ms)
 {
-  for (uint16_t i = 0;i<ms;i++)
+  for (volatile uint16_t i = 0;i<ms;i++)
     {
       delay_us(1000); // 1ms delay
     }

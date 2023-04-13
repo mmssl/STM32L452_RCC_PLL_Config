@@ -4,7 +4,7 @@
 #include "stm32l4xx.h"
 #include "Delay_ms.h"
 
-void RCC_PLL_Clock_Config (void)
+void PLLConfig (void)
 {
   RCC->CFGR |= (1<<8); // enable HSI
   while(!(RCC->CFGR & (1<<10))){}; // wait for enable	
@@ -38,7 +38,7 @@ void GPIO_Config (void)
 
 int main (void)
 {
-  RCC_PLL_Clock_Config();
+  PLLConfig();
   GPIO_Config();
   TIM2Config();
 
