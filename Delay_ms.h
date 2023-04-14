@@ -14,8 +14,9 @@ void TIM2Config (void)
 	2. Set the prescalar and the ARR
 	3. Enable the Timer, and wait for the update Flag to set
 	************************************************/
-        
+	RCC->CFGR &= ~(7<<8);        
 	RCC->APB1ENR1 |= (1<<0);
+
 	TIM2->PSC = 80-1;
 	TIM2->CR1 &= ~(3<<5);
 	TIM2->CR1 &= ~(1<<7);

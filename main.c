@@ -4,21 +4,44 @@
 #include "stm32l4xx.h"
 #include "Delay_ms.h"
 
-void RCC_PLL_Clock_Config (void)
+void PLLConfig (void)
 {
-  RCC->CFGR |= (1<<8); // enable HSI
-  while(!(RCC->CFGR & (1<<10))){}; // wait for enable	
+  RCC->CR |= (1<<8); // enable HSI
+  while(!(RCC->CR & (1<<10))){}; // wait for enable
+  RCC->AHB1ENR |= (1<<8);
+  RCC->APB1ENR1 |= (1<<28);
+  RCC->CFGR &= ~(0xf<<4);
+  //RCC->CFGR |=  (3<<24);
+
+  // FLASH->ACR &= ~(7<<0); // 0 Latency
+  FLASH->ACR |= (3<<0); // 4 Latency
+  FLASH->ACR |= (1<<8);
+  
   RCC->CR &= ~(1<<24); // disable the PLL
-  while((RCC->CR & (1<<25)) != (1<<25)){}; // wait until PLLRDY is cleared
+  while((RCC->CR & RCC_CR_PLLRDY) != RCC_CR_PLLRDY){}
+  //while((RCC->CR & (1<<25)) != (1<<25)){}; // wait until PLLRDY is cleared
 
   RCC->PLLCFGR &= ~(0x7f<<8) & ~(3<<25) & ~(1<<24) & ~(7<<4) & ~(3<<0); // reset the PLLN, PLLR, PLLM, PLLSRC
-  RCC->PLLCFGR |=  (0xb<<8)  |  (2<<0); // set the PLLN and PLLSRC (other paramaters reset state are desired values)
-  RCC->CR |= (1<<24); // enable the PLL
+  RCC->PLLCFGR |=  (0xa<<8)  |  (2<<0); // set the PLLN and PLLSRC (other paramaters reset state are desired values)
+ 
   RCC->CFGR |= (1<<24); // enable the PLL output with setting the PLLR pin 1
-
-  RCC->CFGR &= ~(1<<0); // reset the sw bits
+  RCC->CR   |= (1<<24); // enable the PLL
+  RCC->CFGR &= ~(3<<0); // reset the sw bits
   RCC->CFGR |=  (3<<0); // select PLL as system clock
-  while(!(RCC->CFGR & RCC_CFGR_SWS_PLL)){}; // wait to be set
+  while(!(RCC->CFGR & RCC_CFGR_SWS_PLL)){};
+  //while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SW_PLL){}	// wait to be set
+}
+
+void initClockHSI (void)
+{                           
+  RCC->CR |= RCC_CR_HSION; 
+  while(!(RCC->CR & RCC_CR_HSIRDY)){}
+  
+  RCC->CFGR &= ~RCC_CFGR_SW;
+  
+  RCC->CFGR |= RCC_CFGR_SW_HSI;	
+  while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI){}
+	
 }
 
 void GPIO_Config (void)
@@ -38,15 +61,14 @@ void GPIO_Config (void)
 
 int main (void)
 {
-  RCC_PLL_Clock_Config();
+  PLLConfig();
+  //initClockHSI();
   GPIO_Config();
   TIM2Config();
 
   for(;;)
     {
       GPIOB->ODR ^= (1<<13);
-      delay_ms(100);     
+      delay_ms(1000);     
     }
-
-
 }
