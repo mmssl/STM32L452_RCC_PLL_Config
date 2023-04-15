@@ -4,11 +4,11 @@
 #include "stm32l4xx.h"
 #include "Delay_ms.h"
 
-void PLLConfig (void);
+void initClock (void);
 void GPIO_Config (void);
 
 
-void PLLConfig (void)
+void initClock (void)
 {
   RCC->CR &= ~(1u<<0);
   RCC->CR |= (1<<8); // enable HSI
@@ -44,9 +44,6 @@ void GPIO_Config (void)
   //LED PB13
   GPIOB->MODER &= ~(3u<<26);
   GPIOB->MODER |=  (1<<26);
-  // BUTTON PC13
-  GPIOC->MODER &= ~(3u<<26);
-
   // 3. Configure the OUTPUT MODE
   GPIOB->OTYPER &= ~GPIO_OTYPER_ODR_13;
   GPIOB->OSPEEDR = (1<<27);
@@ -54,7 +51,7 @@ void GPIO_Config (void)
 
 int main (void)
 {
-  PLLConfig();
+  initClock();
   GPIO_Config();
   TIM2Config();
 
