@@ -9,21 +9,21 @@ void delay_ms (volatile uint16_t ms);
 
 void TIM2Config (void)
 {
-	/************** STEPS TO FOLLOW *****************
+  /************** STEPS TO FOLLOW *****************
 	1. Enable Timer clock
 	2. Set the prescalar and the ARR
 	3. Enable the Timer, and wait for the update Flag to set
-	************************************************/
-	RCC->CFGR &= ~(7<<8);        
-	RCC->APB1ENR1 |= (1<<0);
+  ************************************************/
+  RCC->CFGR &= ~(7<<8);        
+  RCC->APB1ENR1 |= (1<<0);
 
-	TIM2->PSC = 80-1;
-	TIM2->CR1 &= ~(3<<5);
-	TIM2->CR1 &= ~(1<<7);
-	TIM2->ARR &= ~(0xffffffff);
-	TIM2->ARR = (0xffff);
-	TIM2->CR1 |= (1<<0);
-	while(!(TIM2->SR & (1<<0)));
+  TIM2->PSC = 80-1;
+  TIM2->CR1 &= ~(3<<5);
+  TIM2->CR1 &= ~(1<<7);
+  TIM2->ARR &= ~(0xffffffff);
+  TIM2->ARR = (0xffff);
+  TIM2->CR1 |= (1<<0);
+  while(!(TIM2->SR & (1<<0)));
 
 }
 
